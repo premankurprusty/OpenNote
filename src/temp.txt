@@ -1,0 +1,101 @@
+//use std::env;
+use crate::error::LexerError;
+mod token;
+use std::fs;
+use std::path::Path;
+use std::str;
+use token::Token;
+
+fn load(filename: &str) -> Result<String, LexerError> {
+    let path = Path::new(filename);
+
+    if !path.exists() {
+        return Err(LexerError::FileNotFound {
+            path: filename.to_string(),
+        });
+    };
+
+    if path.extension().and_then(|extension| extension.to_str()) != Some("txt") {
+        return Err(LexerError::InvalidExtension {
+            error: "File must be a .txt file".to_string(),
+        });
+    };
+
+    let contents = fs::read_to_string(&path).unwrap();
+    Ok(contents)
+}
+
+fn tokenize(filename: &str) -> Result<Vec<Token>, LexerError> {
+    let contents = load(filename)?;
+    let mut tokens = Vec::new();
+    for line in contents.lines() {
+        if line.is_empty() {
+            tokens.push(Token::Newline);
+        } else {
+            match line.chars().next() {
+                Some('.') => {
+                    block(&line, &mut tokens);
+                }
+                _ => {
+                    tokens.push(Token::NoInit);
+                    inline(&line, &mut tokens);
+                }
+            };
+        };
+    }
+    Ok(tokens)
+}
+
+fn block(line: &str, tokens: &mut Vec<Token>) {
+    if line.starts_with(".hh ") {
+        tokens.push(Token::HeaderInit);
+        inline(&line[4..], tokens);
+    } else if line.starts_with(".h ") {
+        tokens.push(Token::SubheaderInit);
+        inline(&line[3..], tokens);
+    } else if line.starts_with(". ") {
+        tokens.push(Token::ContentInit);
+        inline(&line[2..], tokens);
+    } else {
+        tokens.push(Token::NoInit);
+        inline(&line, tokens);
+    }
+    tokens.push(Token::Newline);
+}
+
+fn inline(line: &str, tokens: &mut Vec<Token>) {
+    let mut buffer = String::new();
+    for char in line.chars() {
+        match char {
+            '<' => {
+                tokens.push(Token::Text(buffer.clone()));
+                buffer.clear();
+                tokens.push(Token::BoldInit);
+            }
+            '>' => {
+                tokens.push(Token::Text(buffer.clone()));
+                buffer.clear();
+                tokens.push(Token::BoldEnd);
+            }
+            '[' => {
+                tokens.push(Token::Text(buffer.clone()));
+                buffer.clear();
+                tokens.push(Token::ItalicInit);
+            }
+            ']' => {
+                tokens.push(Token::Text(buffer.clone()));
+                buffer.clear();
+                tokens.push(Token::ItalicEnd);
+            }
+
+            _ => buffer.push(char),
+        }
+    }
+    if !buffer.is_empty() {
+        tokens.push(Token::Text(buffer));
+    }
+}
+
+fn lex(filename: &str) -> Result<Vec<Token>, LexerError> {
+    tokenize(filename)
+}
