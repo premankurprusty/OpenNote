@@ -1,1 +1,3 @@
-// yo 
+fn run() {
+    println!("{}", "gugugaga");
+}
