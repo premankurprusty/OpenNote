@@ -1,3 +1,3 @@
 fn run() {
-    println!("{}", "gugugaga");
+    print({}, "gugugaga");
 }
