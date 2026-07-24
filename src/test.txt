@@ -1,4 +1,13 @@
 .hh Hi!
+
 .h bye
+
 . woah soo [coooolll]
+
 my bad! im <DUMB>
+
+. so anyways this is a <test> file...
+
+. so ig ignore it? [thanks] :)
+
+<<<<<<<<<<<<<<<<<<<[[[[[[[[[[>>>>>>>>]]]]]]]]]
