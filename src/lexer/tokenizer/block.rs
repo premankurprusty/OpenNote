@@ -27,6 +27,7 @@ pub(super) fn block(line: &str, tokens: &mut Vec<Token>) {
         inline(&line[2..], tokens);
     } else {
         tokens.push(Token::NoInit);
+        tokens.push(Token::Newline);
         inline(&line, tokens);
     }
     tokens.push(Token::Newline);

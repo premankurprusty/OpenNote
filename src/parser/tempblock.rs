@@ -1,17 +1,24 @@
 use crate::lexer::token::Token;
 #[derive(Debug)]
-pub enum Block {
+pub enum TempBlock {
     Header(HeaderBlock),
     Content(ContentBlock),
     None(NoBlock),
 }
 
-impl Block {
+impl TempBlock {
     pub fn push(&mut self, token: Token) {
         match self {
-            Block::Header(header) => header.push(token),
-            Block::Content(content) => content.push(token),
-            Block::None(no_block) => no_block.push(token),
+            TempBlock::Header(header) => header.push(token),
+            TempBlock::Content(content) => content.push(token),
+            TempBlock::None(no_block) => no_block.push(token),
+        }
+    }
+    pub fn contents(&self) -> Vec<Token> {
+        match self {
+            TempBlock::Header(header) => header.children.clone(),
+            TempBlock::Content(content) => content.children.clone(),
+            TempBlock::None(no_block) => no_block.children.clone(),
         }
     }
 }

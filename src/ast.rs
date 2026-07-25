@@ -13,9 +13,11 @@ pub enum Block {
     },
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Inline {
     Text(String),
     Bold(Vec<Inline>),
     Italic(Vec<Inline>),
     NewLine,
+    ToBeCleaned(String),
 }

@@ -11,15 +11,7 @@ pub(super) fn tokenize(content: &str) -> Result<Vec<Token>, LexerError> {
         if line.is_empty() {
             tokens.push(Token::Newline);
         } else {
-            match line.chars().next() {
-                Some('.') => {
-                    block(&line, &mut tokens);
-                }
-                _ => {
-                    tokens.push(Token::NoInit);
-                    inline(&line, &mut tokens);
-                }
-            };
+            block(&line, &mut tokens);
         };
     }
     Ok(tokens)
