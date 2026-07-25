@@ -11,8 +11,15 @@ pub(super) fn block(line: &str, tokens: &mut Vec<Token>) {
             }
         }
         match level.parse::<usize>() {
-            Ok(level) => tokens.push(Token::HeaderInit(level)),
-            Err(_) => tokens.push(Token::HeaderInit(0)),
+            Ok(level) => {
+                if level == 0 {
+                    let level = 1;
+                    tokens.push(Token::HeaderInit(level));
+                } else {
+                    tokens.push(Token::HeaderInit(level));
+                }
+            }
+            Err(_) => tokens.push(Token::HeaderInit(1)),
         }
         inline(&line[4..], tokens);
     } else if line.starts_with(".") {
