@@ -1,5 +1,5 @@
 mod loader;
-mod token;
+pub mod token;
 mod tokenizer;
 use crate::error::LexerError;
 //use crate::lexer::token::Token;

@@ -1,6 +1,6 @@
-.hh Hi!
+.h1 Hi!
 
-.h bye
+.h2 bye
 
 . woah soo [coooolll]
 

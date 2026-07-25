@@ -1,13 +1,21 @@
 use crate::lexer::token::Token;
 
 pub(super) fn block(line: &str, tokens: &mut Vec<Token>) {
-    if line.starts_with(".hh ") {
-        tokens.push(Token::HeaderInit);
+    if line.starts_with(".h") {
+        let mut level: String = String::new();
+        for char in line[2..].chars() {
+            if char.is_ascii_digit() {
+                level.push(char);
+            } else {
+                break;
+            }
+        }
+        match level.parse::<usize>() {
+            Ok(level) => tokens.push(Token::HeaderInit(level)),
+            Err(_) => tokens.push(Token::HeaderInit(0)),
+        }
         inline(&line[4..], tokens);
-    } else if line.starts_with(".h ") {
-        tokens.push(Token::SubheaderInit);
-        inline(&line[3..], tokens);
-    } else if line.starts_with(". ") {
+    } else if line.starts_with(".") {
         tokens.push(Token::ContentInit);
         inline(&line[2..], tokens);
     } else {
