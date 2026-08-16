@@ -1,7 +1,9 @@
+#[derive(Debug)]
 pub struct Document {
     pub nodes: Vec<Block>,
 }
 
+#[derive(Debug, Clone, PartialEq)]
 pub enum Block {
     Header {
         level: usize,
@@ -19,5 +21,13 @@ pub enum Inline {
     Bold(Vec<Inline>),
     Italic(Vec<Inline>),
     NewLine,
-    ToBeCleaned(String),
+}
+
+impl IntoIterator for Document {
+    type Item = Block;
+    type IntoIter = std::vec::IntoIter<Block>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.nodes.into_iter()
+    }
 }

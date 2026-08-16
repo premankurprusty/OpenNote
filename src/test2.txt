@@ -1,0 +1,5 @@
+.h Hello World
+
+. print("Hello World")
+
+this prints to the <[terminal!]

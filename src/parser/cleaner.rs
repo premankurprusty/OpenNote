@@ -1,5 +1,4 @@
-use crate::ast::Inline;
-use crate::parser::tempinlined::TempInlined;
+use crate::parser::tempinlined::{TempInline, TempInlined};
 
 pub(super) fn clean(blocks: Vec<TempInlined>) -> Vec<TempInlined> {
     let mut cleaned_blocks = Vec::new();
@@ -16,35 +15,80 @@ pub(super) fn clean(blocks: Vec<TempInlined>) -> Vec<TempInlined> {
             TempInlined::Notype(_) => cleaned_blocks.push(TempInlined::Notype(cleaned_contents)),
         }
     }
-    cleaned_blocks
+    merge_blocks(cleaned_blocks)
 }
 
-fn clean_inline(contents: &mut Vec<Inline>) -> Vec<Inline> {
+fn clean_inline(contents: &mut Vec<TempInline>) -> Vec<TempInline> {
     let mut cleaned_contents = Vec::new();
     for item in contents {
         match item {
-            Inline::Text(text) => cleaned_contents.push(Inline::Text(text.clone())),
-            Inline::Bold(contents) => {
-                if contents.contains(&Inline::ToBeCleaned("<".to_string())) {
+            TempInline::Text(text) => cleaned_contents.push(TempInline::Text(text.clone())),
+            TempInline::Bold(contents) => {
+                if contents.contains(&TempInline::ToBeCleaned("<".to_string())) {
                     cleaned_contents.append(&mut clean_inline(contents));
                 } else {
-                    cleaned_contents.push(Inline::Bold(clean_inline(contents)));
+                    cleaned_contents.push(TempInline::Bold(clean_inline(contents)));
                 }
             }
-            Inline::Italic(contents) => {
-                if contents.contains(&Inline::ToBeCleaned("[".to_string())) {
+            TempInline::Italic(contents) => {
+                if contents.contains(&TempInline::ToBeCleaned("[".to_string())) {
                     cleaned_contents.append(&mut clean_inline(contents));
                 } else {
-                    cleaned_contents.push(Inline::Italic(clean_inline(contents)));
+                    cleaned_contents.push(TempInline::Italic(clean_inline(contents)));
                 }
             }
-            Inline::NewLine => {
-                cleaned_contents.push(Inline::NewLine);
+            TempInline::NewLine => {
+                cleaned_contents.push(TempInline::NewLine);
             }
-            Inline::ToBeCleaned(content) => cleaned_contents.push(Inline::Text(content.clone())),
+            TempInline::ToBeCleaned(content) => {
+                cleaned_contents.push(TempInline::Text(content.clone()))
+            }
         }
     }
+    merge(cleaned_contents)
+}
+
+fn merge(contents: Vec<TempInline>) -> Vec<TempInline> {
+    let mut cleaned_contents = Vec::new();
+    let mut buffer = String::new();
+    for item in contents {
+        if let TempInline::Text(content) = item {
+            buffer.push_str(&content);
+        } else {
+            if !buffer.is_empty() {
+                cleaned_contents.push(TempInline::Text(buffer.clone()));
+                buffer.clear();
+            }
+            cleaned_contents.push(item);
+        }
+    }
+    if !buffer.is_empty() {
+        cleaned_contents.push(TempInline::Text(buffer));
+    }
+
     cleaned_contents
 }
 
-//fn merge(contents: &mut Vec<Inline>) -> Vec<Inline> {}
+fn merge_blocks(blocks: Vec<TempInlined>) -> Vec<TempInlined> {
+    let mut tempdoc = Vec::new();
+
+    for block in blocks {
+        match block {
+            TempInlined::Header(level, content) => {
+                tempdoc.push(TempInlined::Header(level, content));
+            }
+            TempInlined::Paragraph(content) => {
+                tempdoc.push(TempInlined::Paragraph(content));
+            }
+            TempInlined::Notype(mut content) => {
+                if let Some(last) = tempdoc.last_mut() {
+                    last.content_mut().append(&mut content);
+                } else {
+                    tempdoc.push(TempInlined::Notype(content));
+                }
+            }
+        }
+    }
+
+    tempdoc
+}

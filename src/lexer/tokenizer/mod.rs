@@ -1,9 +1,7 @@
 mod block;
-use crate::lexer::tokenizer::block::block;
-use crate::lexer::tokenizer::block::inline;
-
 use crate::error::LexerError;
 use crate::lexer::token::Token;
+use crate::lexer::tokenizer::block::block;
 
 pub(super) fn tokenize(content: &str) -> Result<Vec<Token>, LexerError> {
     let mut tokens = Vec::new();

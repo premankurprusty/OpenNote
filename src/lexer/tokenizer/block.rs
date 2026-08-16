@@ -15,19 +15,22 @@ pub(super) fn block(line: &str, tokens: &mut Vec<Token>) {
                 if level == 0 {
                     let level = 1;
                     tokens.push(Token::HeaderInit(level));
+                    inline(&line[4..], tokens);
                 } else {
                     tokens.push(Token::HeaderInit(level));
+                    inline(&line[4..], tokens);
                 }
             }
-            Err(_) => tokens.push(Token::HeaderInit(1)),
+            Err(_) => {
+                tokens.push(Token::HeaderInit(1));
+                inline(&line[3..], tokens);
+            }
         }
-        inline(&line[4..], tokens);
     } else if line.starts_with(".") {
         tokens.push(Token::ContentInit);
         inline(&line[2..], tokens);
     } else {
         tokens.push(Token::NoInit);
-        tokens.push(Token::Newline);
         inline(&line, tokens);
     }
     tokens.push(Token::Newline);

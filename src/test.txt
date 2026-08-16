@@ -1,22 +1,21 @@
 .h1 Hi!
 
-.h2 bye
+.h2 Hi!
 
-. woah soo [coooolll]
+.h3 Hi!
 
-my bad! im <DUMB>
+.h2 Hi!
 
-. so anyways this is a <test> file...
+.h3 Hi!
 
-. so ig ignore it? [thanks] :)
+.h1 Hi!
 
-<hi>
-[hi]
-<[hi]>
-<[hi>]
-[<hi>]
-.[<hi]>
-<hi
-[hi
-hi]
-hi>
+.h2 Hi!
+
+.h3 Hi!
+
+.h2 Hi!
+
+.h3 Hi!
+
+
