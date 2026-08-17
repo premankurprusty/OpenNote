@@ -2,4 +2,4 @@
 
 . print("Hello World")
 
-this prints to the <[terminal!]
+this prints to the <[terminal!]>
